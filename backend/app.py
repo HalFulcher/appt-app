@@ -36,15 +36,47 @@ def get_interviewers():
     
     tmpList =[]
     for doc in db.collection('interviewer').stream():
-        cand = dict()
-        cand.update(id=doc.id)
-        cand.update(doc.to_dict())
+        inter = dict()
+        inter.update(id=doc.id)
+        inter.update(doc.to_dict())
 
-        tmpList.append(cand)
+        tmpList.append(inter)
     
     return jsonify(tmpList)
 
+@app.route('/test/', methods=['GET'])
+def find_interviewers(candArea, day):
+    tmpList = []
+    for doc in db.collection('interviewer').stream():
+        inter = dict()
+        inter.update(id=doc.id)
+        inter.update(doc.to_dict())
+        tmpList.append(inter)
+    
+    finalList = []
+    for i in tmpList:
+        if candArea in i['Area'] and i['Availability'][day] == True:
+            finalList.append(i)
 
+    if len(finalList) == 0:
+        return 'No interviewer available'
+    
+    return jsonify(finalList)
+    
+
+@app.route('/update/', methods=['GET'])
+def update_availability(candId, interId, day):
+
+    interDoc = db.collection('interviewer').document(interId)
+    interUpdate = {"Availability."+day : False}
+    interDoc.update(interUpdate)
+
+    candDoc = db.collection('candidate').document(candId)
+    candUpdate = {'booked' : False}
+    candDoc.update(candUpdate)
+
+
+    return 'Success!'
 
 
 
