@@ -45,7 +45,9 @@ def get_interviewers():
     return jsonify(tmpList)
 
 @app.route('/test/', methods=['GET'])
-def find_interviewers(candArea, day):
+def find_interviewers():
+    day=request.args.get('day')
+    candArea=request.args.get('candArea')
     tmpList = []
     for doc in db.collection('interviewer').stream():
         inter = dict()
